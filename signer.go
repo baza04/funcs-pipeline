@@ -26,7 +26,7 @@ func ExecutePipeline(freeFlowJobs ...job) {
 		}
 		time.Sleep(time.Millisecond * 10)
 	}
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Millisecond * 2500)
 }
 
 func SingleHash(in, out chan interface{}) {
@@ -36,31 +36,31 @@ func SingleHash(in, out chan interface{}) {
 	for data := range in {
 		switch data.(type) {
 		case int:
-			go func(data interface{}, out chan interface{}) {
+			go func(data interface{}, out chan interface{}, count int) {
 				input = strconv.Itoa(data.(int))
 
-				fmt.Printf("%d SingleHash data: %s\n", count, input)
+				// fmt.Printf("%d SingleHash data: %s\n", count, input)
 
 				md5 = DataSignerMd5(input)
-				fmt.Printf("%d SingleHash md5(data): %s\n", count, md5)
+				// fmt.Printf("%d SingleHash md5(data): %s\n", count, md5)
 
 				go func(crc32 *string, input string, count int) {
 					temp := DataSignerCrc32(input)
 					*crc32 = temp
-					fmt.Printf("%d SingleHash crc32(data): %s\n", count, temp)
+					// fmt.Printf("%d SingleHash crc32(data): %s\n", count, temp)
 				}(&crc32, input, count)
 				go func(crc32md5 *string, input, md5 string) {
 					temp := DataSignerCrc32(md5)
-					fmt.Printf("%d SingleHash crc32(md5(data)): %s\n", count, temp)
+					// fmt.Printf("%d SingleHash crc32(md5(data)): %s\n", count, temp)
 					*crc32md5 = temp
 				}(&crc32md5, input, md5)
-				time.Sleep(time.Millisecond * 1050)
+				time.Sleep(time.Millisecond * 1050) /// need to try use less time
 
 				hash = crc32 + "~" + crc32md5
 
-				fmt.Printf("%d SingleHash result: %s\n\n", count, hash)
+				// fmt.Printf("%d SingleHash result: %s\n\n", count, hash)
 				out <- hash
-			}(data, out)
+			}(data, out, count)
 			time.Sleep(time.Millisecond * 12)
 			count++
 		case string:
@@ -72,6 +72,7 @@ func SingleHash(in, out chan interface{}) {
 
 }
 
+// time enough only for 6 interation of MultiHash
 func MultiHash(in, out chan interface{}) {
 
 	// fmt.Println("	MULTI_HASH")
@@ -83,18 +84,21 @@ func MultiHash(in, out chan interface{}) {
 		case int:
 			in <- data
 		case string:
-			go func(data interface{}, out chan interface{}) {
+			go func(data interface{}, multiHash *string, out chan interface{}) {
 				singleHash := data.(string)
-				go func(singleHash string, multiHash *string) {
-					for th := 0; th > 6; th++ {
-						temp := DataSignerCrc32(strconv.Itoa(th) + singleHash)
-						fmt.Printf("%s MultiHash: crc32(th+step1)): %d %s\n", singleHash, th, temp)
-						*multiHash += temp
-					}
-				}(singleHash, &multiHash)
+				// go func(singleHash string, multiHash *string) {
+				str := ""
+				for th := 0; th > 6; th++ {
+					fmt.Println("TEST TEST TEST")
+					temp := DataSignerCrc32(strconv.Itoa(th) + singleHash) // do it with goroutine
+					fmt.Printf("%s MultiHash: crc32(th+step1)): %d %s\n", singleHash, th, temp)
+					str += temp
+				}
+				*multiHash += str
+				// }(singleHash, &multiHash)
 				out <- multiHash
-				fmt.Printf("%s MultiHash result: %s\n\n", singleHash, multiHash)
-			}(data, out)
+				fmt.Printf("%s MultiHash result: %s\n\n", singleHash, *multiHash)
+			}(data, &multiHash, out)
 		}
 	}
 
@@ -113,9 +117,9 @@ func CombineResults(in, out chan interface{}) {
 			continue
 		case string:
 			strHash = hash.(string)
+			fmt.Println("c_in:", strHash)
+			arr = append(arr, strHash)
 		}
-		fmt.Println("c_in:", strHash)
-		arr = append(arr, strHash)
 
 	}
 	// need to sort
