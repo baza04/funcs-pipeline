@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
-
-var mu sync.Mutex
 
 func main() {
 
@@ -19,76 +17,96 @@ func main() {
 }
 
 func ExecutePipeline(freeFlowJobs ...job) {
-	in, out := make(chan interface{}, 5), make(chan interface{}, 5)
-	for index, function := range freeFlowJobs {
+	in, out := make(chan interface{}), make(chan interface{})
+	for index, job := range freeFlowJobs {
 		if index%2 == 0 {
-			go function(in, out)
+			go job(in, out)
 		} else {
-			go function(out, in)
+			go job(out, in)
 		}
-		// if index == 1 {
-		// 	time.Sleep(time.Second * 1)
-		// }
-		// time.Sleep(time.Millisecond * 250)
+		// time.Sleep(time.Millisecond * 10)
 	}
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 4)
 }
 
 func SingleHash(in, out chan interface{}) {
-	// fmt.Println("	SIGNLE_HASH:", <-or)
-
-	fmt.Println("	SIGNLE_HASH")
+	// fmt.Println("	SIGNLE_HASH")
 	var input, crc32, md5, crc32md5, hash string
+	var count int
 	for data := range in {
-		input = strconv.Itoa(data.(int))
-		fmt.Println("s_in:", input)
+		switch data.(type) {
+		case int:
+			input = strconv.Itoa(data.(int))
 
-		md5 = DataSignerMd5(input)
-		fmt.Println("md5:", md5)
+			fmt.Printf("%d SingleHash data: %s\n", count, input)
 
-		go func(crc32 *string, input string) {
-			*crc32 = DataSignerCrc32(input)
-		}(&crc32, input)
-		go func(crc32md5 *string, input, md5 string) {
-			fmt.Println("md5 in GO:", md5)
-			*crc32md5 = DataSignerCrc32(md5)
-		}(&crc32md5, input, md5)
-		time.Sleep(time.Millisecond * 1200)
-		// if
-		hash = crc32 + "~" + crc32md5
+			md5 = DataSignerMd5(input)
+			fmt.Printf("%d SingleHash md5(data): %s\n", count, md5)
 
-		fmt.Printf("crc32_go: %s\ncrc32md5: %s\nhash: %s\n\n", crc32, crc32md5, hash)
-		out <- hash
+			go func(crc32 *string, input string, count int) {
+				temp := DataSignerCrc32(input)
+				*crc32 = temp
+				fmt.Printf("%d SingleHash crc32(data): %s\n", count, temp)
+			}(&crc32, input, count)
+			go func(crc32md5 *string, input, md5 string) {
+				temp := DataSignerCrc32(md5)
+				fmt.Printf("%d SingleHash crc32(md5(data)): %s\n", count, temp)
+				*crc32md5 = temp
+			}(&crc32md5, input, md5)
+			time.Sleep(time.Millisecond * 1050)
+
+			hash = crc32 + "~" + crc32md5
+
+			fmt.Printf("%d SingleHash result: %s\n\n", count, hash)
+			out <- hash
+			count++
+		case string:
+			in <- data
+			runtime.Gosched()
+			// continue
+		}
 	}
 }
 
 func MultiHash(in, out chan interface{}) {
 
-	fmt.Println("	MULTI_HASH")
-	th := 0
-	var multiHash string
+	// fmt.Println("	MULTI_HASH")
+	var count int
 	for data := range in {
-		fmt.Println("m_in:", data)
-		go func(data interface{}, multiHash *string, th int) {
-			*multiHash = DataSignerCrc32(strconv.Itoa(th) + data.(string))
-		}(data, &multiHash, th)
-		// multiHash := DataSignerCrc32(strconv.Itoa(th) + strconv.Itoa(data.(int)))
-		fmt.Println("MyMultiHash:", multiHash)
-		out <- multiHash
-		th++
+		var multiHash string
+		fmt.Printf("MultiHash input: %s\n\n", data)
+		switch data.(type) {
+		case int:
+			in <- data
+			continue
+		case string:
+			singleHash := data.(string)
+			go func(singleHash string, multiHash *string) {
+				for th := 0; th > 6; th++ {
+					temp := DataSignerCrc32(strconv.Itoa(th) + singleHash)
+					fmt.Printf("%s MultiHash: crc32(th+step1)): %d %s\n", singleHash, th, temp)
+					*multiHash += temp
+				}
+			}(singleHash, &multiHash)
+			out <- multiHash
+			fmt.Printf("%s MultiHash result: %s\n\n", singleHash, multiHash)
+			count++
+		}
 	}
 
 }
 
 func CombineResults(in, out chan interface{}) {
 
-	fmt.Println("	COMBINE_HASH")
+	// fmt.Println("	COMBINE_HASH")
 	arr := []string{}
 	for hash := range in {
 		var strHash string // := hash.(string)
 		switch hash.(type) {
 		case int:
-			strHash = strconv.Itoa(hash.(int))
+			in <- hash
+			runtime.Gosched()
+			continue
 		case string:
 			strHash = hash.(string)
 		}
@@ -106,3 +124,10 @@ func CombineResults(in, out chan interface{}) {
 
 // leftHalf := DataSignerCrc32(data.(string))
 // rightHalf := DataSignerCrc32(DataSignerMd5(data.(string)))
+
+/* func concurCall(mu *sync.Mutex, function job, in, out chan interface{}) {
+	mu.Lock()
+	function(in, out)
+	mu.Unlock()
+}
+*/
