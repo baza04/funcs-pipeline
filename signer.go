@@ -5,10 +5,12 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
 // why for loop can`t work in goroutine
+var mu = &sync.Mutex{}
 
 // ExecutePipeline обеспечивает нам конвейерную обработку функций-воркеров, которые что-то делают.
 func ExecutePipeline(freeFlowJobs ...job) {
@@ -16,11 +18,13 @@ func ExecutePipeline(freeFlowJobs ...job) {
 	for _, function := range freeFlowJobs {
 		out := make(chan interface{})
 
-		go func(in, out chan interface{}, function job) {
+		go func(in, out chan interface{}, function job, mu *sync.Mutex) {
+			// mu.Lock()
 			function(in, out)
+			// mu.Unlock()
 			time.Sleep(time.Millisecond * 2500)
 			close(out)
-		}(in, out, function)
+		}(in, out, function, mu)
 
 		in = out
 	}
@@ -33,33 +37,46 @@ func SingleHash(in, out chan interface{}) {
 	var count int
 	for data := range in {
 
-		go func(data interface{}, out chan interface{}, count int) {
+		go func(data interface{}, out chan interface{}, count int, mu *sync.Mutex) {
 			var input, crc32, md5, crc32md5, hash string
-			start := time.Now()
+			// start := time.Now()
 			input = strconv.Itoa(data.(int))
 			// fmt.Printf("%d SingleHash data: %s\n", count, input)
 
+			mu.Lock()
 			md5 = DataSignerMd5(input)
+			mu.Unlock()
 			// fmt.Printf("%d SingleHash md5(data): %s\n", count, md5)
 
-			go func(crc32 *string, input string, count int) {
+			go func(crc32 *string, input string, count int, mu *sync.Mutex) {
+				mu.Lock()
 				temp := DataSignerCrc32(input)
 				*crc32 = temp
-				fmt.Printf("%d SingleHash crc32(data): %s\n", count, temp)
-			}(&crc32, input, count)
-			go func(crc32md5 *string, input, md5 string) {
+				mu.Unlock()
+				// fmt.Printf("%d SingleHash crc32(data): %s\n", count, temp)
+			}(&crc32, input, count, mu)
+			go func(crc32md5 *string, input, md5 string, mu *sync.Mutex) {
+				mu.Lock()
 				temp := DataSignerCrc32(md5)
-				fmt.Printf("%d SingleHash crc32(md5(data)): %s\n", count, temp)
+				// fmt.Printf("%d SingleHash crc32(md5(data)): %s\n", count, temp)
 				*crc32md5 = temp
-			}(&crc32md5, input, md5)
+				mu.Unlock()
+			}(&crc32md5, input, md5, mu)
 			time.Sleep(time.Millisecond * 1200) /// need to try use less time
 
-			hash = crc32 + "~" + crc32md5 + "_" + strconv.Itoa(count) // test
-			// hash = crc32 + "~" + crc32md5
+			// hash = crc32 + "~" + crc32md5 + "_" + strconv.Itoa(count) // test
+			mu.Lock()
+			hash = crc32 + "~" + crc32md5
+			mu.Unlock()
 
-			fmt.Printf("%d SingleHash result: %s exec time: %v\n\n", count, hash, time.Since(start))
+			// fmt.Printf("%d SingleHash result: %s exec time: %v\n\n", count, hash, time.Since(start))
+			// last changes
+			mu.Lock()
 			out <- hash
-		}(data, out, count)
+			mu.Unlock()
+			// last changes
+
+		}(data, out, count, mu)
 		time.Sleep(time.Millisecond * 12)
 		count++
 	}
@@ -71,7 +88,7 @@ func MultiHash(in, out chan interface{}) {
 	defer close(out)
 	for data := range in {
 
-		go func(data interface{}, out chan interface{}) {
+		go func(data interface{}, out chan interface{}, mu *sync.Mutex) {
 			fmt.Printf("MultiHash input: %s\n\n", data)
 			var multiHash string
 			a := strings.Split(data.(string), "_")
@@ -85,18 +102,22 @@ func MultiHash(in, out chan interface{}) {
 			go iterMultiHash(singleHash, 5, arr)
 
 			time.Sleep(time.Millisecond * 1050)
+			mu.Lock()
 			multiHash += strings.Join(arr, "")
+			mu.Unlock()
 
 			out <- multiHash
 			// fmt.Printf("%s, #%s MultiHash result: %s\n\n", singleHash, a[1], multiHash)
-		}(data, out)
+		}(data, out, mu)
 	}
 
 }
 
-func iterMultiHash(singleHash string, th int, arr []string) {
+func iterMultiHash(singleHash string, th int, arr []string /* , mu *sync.Mutex */) {
+	// mu.Lock()
 	arr[th] = DataSignerCrc32(strconv.Itoa(th) + singleHash) // do it with goroutine
-	fmt.Printf("%s MultiHash: crc32(th+step1)): %d %s\n", singleHash, th, arr[th])
+	// mu.Unlock()
+	// fmt.Printf("%s MultiHash: crc32(th+step1)): %d %s\n", singleHash, th, arr[th])
 }
 
 //CombineResults получает все результаты, сортирует (https://golang.org/pkg/sort/), объединяет отсортированный результат через _ (символ подчеркивания) в одну строку
@@ -114,7 +135,7 @@ func CombineResults(in, out chan interface{}) {
 		// fmt.Printf("\n\nCOMBINE_RESULTS ARR len: %d, value: %v\n\n", len(sArr), sArr)
 	}
 	// need to close channels to end range from in
-	fmt.Println("TEST TEST TEST")
+	// fmt.Println("TEST TEST TEST")
 
 	sort.Strings(sArr)
 	fmt.Printf("\n\nCOMBINE_RESULTS SORTED ARR value: %v\n\n", sArr)

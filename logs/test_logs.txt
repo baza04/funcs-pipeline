@@ -1,0 +1,478 @@
+TEST FAIL
+
+STDOUT:
+collected 3
+collected 9
+collected 12
+==================
+WARNING: DATA RACE
+Read at 0x00c0000a8080 by goroutine 8:
+  coursera/__grader/assigments/hw2_signer.TestByIlia()
+      /go/src/coursera/__grader/assigments/hw2_signer/extra_test.go:57 +0x186
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+
+Previous write at 0x00c0000a8080 by goroutine 11:
+  sync/atomic.AddInt32()
+      /usr/local/go/src/runtime/race_amd64.s:269 +0xb
+  coursera/__grader/assigments/hw2_signer.TestByIlia.func3()
+      /go/src/coursera/__grader/assigments/hw2_signer/extra_test.go:40 +0x83
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+
+Goroutine 8 (running) created at:
+  testing.(*T).Run()
+      /usr/local/go/src/testing/testing.go:960 +0x651
+  testing.runTests.func1()
+      /usr/local/go/src/testing/testing.go:1202 +0xa6
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+  testing.runTests()
+      /usr/local/go/src/testing/testing.go:1200 +0x521
+  testing.(*M).Run()
+      /usr/local/go/src/testing/testing.go:1117 +0x2ff
+  main.main()
+      _testmain.go:48 +0x223
+
+Goroutine 11 (running) created at:
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:19 +0xd6
+  coursera/__grader/assigments/hw2_signer.TestByIlia()
+      /go/src/coursera/__grader/assigments/hw2_signer/extra_test.go:47 +0x145
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+==================
+--- FAIL: TestByIlia (2.80s)
+    extra_test.go:54: execition too long
+        Got: 2.800400852s
+        Expected: <350ms
+    testing.go:853: race detected during execution of test
+==================
+WARNING: DATA RACE
+Read at 0x00c00001a0b4 by goroutine 15:
+  coursera/__grader/assigments/hw2_signer.TestPipeline()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:43 +0x220
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+
+Previous write at 0x00c00001a0b4 by goroutine 17:
+  sync/atomic.AddInt32()
+      /usr/local/go/src/runtime/race_amd64.s:269 +0xb
+  coursera/__grader/assigments/hw2_signer.TestPipeline.func2()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:38 +0x69
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+
+Goroutine 15 (running) created at:
+  testing.(*T).Run()
+      /usr/local/go/src/testing/testing.go:960 +0x651
+  testing.runTests.func1()
+      /usr/local/go/src/testing/testing.go:1202 +0xa6
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+  testing.runTests()
+      /usr/local/go/src/testing/testing.go:1200 +0x521
+  testing.(*M).Run()
+      /usr/local/go/src/testing/testing.go:1117 +0x2ff
+  main.main()
+      _testmain.go:48 +0x223
+
+Goroutine 17 (running) created at:
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:19 +0xd6
+  coursera/__grader/assigments/hw2_signer.TestPipeline()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:42 +0x1a7
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+==================
+--- FAIL: TestPipeline (2.80s)
+    testing.go:853: race detected during execution of test
+0 SingleHash crc32(data): 4108050209
+0 SingleHash crc32(md5(data)): 502633748
+1 SingleHash crc32(md5(data)): 709660146
+1 SingleHash crc32(data): 2212294583
+2 SingleHash crc32(data): 2212294583
+2 SingleHash crc32(md5(data)): 709660146
+3 SingleHash crc32(data): 450215437
+3 SingleHash crc32(md5(data)): 1933333237
+4 SingleHash crc32(data): 1842515611
+4 SingleHash crc32(md5(data)): 1684880638
+5 SingleHash crc32(data): 2226203566
+5 SingleHash crc32(md5(data)): 3690458478
+6 SingleHash crc32(data): 4194326291
+6 SingleHash crc32(md5(data)): 2004971030
+==================
+WARNING: DATA RACE
+Read at 0x00c000064090 by goroutine 22:
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:54 +0x225
+
+Previous write at 0x00c000064090 by goroutine 25:
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1.1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:44 +0x9b
+
+Goroutine 22 (running) created at:
+  coursera/__grader/assigments/hw2_signer.SingleHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:37 +0xcd
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+
+Goroutine 25 (finished) created at:
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:42 +0x1b0
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0000640a0 by goroutine 22:
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:54 +0x24c
+
+Previous write at 0x00c0000640a0 by goroutine 26:
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1.2()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:50 +0x167
+
+Goroutine 22 (running) created at:
+  coursera/__grader/assigments/hw2_signer.SingleHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:37 +0xcd
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+
+Goroutine 26 (finished) created at:
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:47 +0x207
+==================
+MultiHash input: 4108050209~502633748
+
+MultiHash input: 2212294583~709660146
+
+MultiHash input: 2212294583~709660146
+
+MultiHash input: 450215437~1933333237
+
+MultiHash input: 1842515611~1684880638
+
+MultiHash input: 2226203566~3690458478
+
+MultiHash input: 4194326291~2004971030
+
+4108050209~502633748 MultiHash: crc32(th+step1)): 0 2956866606
+4108050209~502633748 MultiHash: crc32(th+step1)): 1 803518384
+4108050209~502633748 MultiHash: crc32(th+step1)): 2 1425683795
+4108050209~502633748 MultiHash: crc32(th+step1)): 3 3407918797
+4108050209~502633748 MultiHash: crc32(th+step1)): 4 2730963093
+4108050209~502633748 MultiHash: crc32(th+step1)): 5 1025356555
+2212294583~709660146 MultiHash: crc32(th+step1)): 0 495804419
+2212294583~709660146 MultiHash: crc32(th+step1)): 2 4182335870
+2212294583~709660146 MultiHash: crc32(th+step1)): 1 2186797981
+2212294583~709660146 MultiHash: crc32(th+step1)): 3 1720967904
+2212294583~709660146 MultiHash: crc32(th+step1)): 4 259286200
+2212294583~709660146 MultiHash: crc32(th+step1)): 5 2427381542
+2212294583~709660146 MultiHash: crc32(th+step1)): 0 495804419
+2212294583~709660146 MultiHash: crc32(th+step1)): 1 2186797981
+2212294583~709660146 MultiHash: crc32(th+step1)): 2 4182335870
+2212294583~709660146 MultiHash: crc32(th+step1)): 3 1720967904
+2212294583~709660146 MultiHash: crc32(th+step1)): 5 2427381542
+2212294583~709660146 MultiHash: crc32(th+step1)): 4 259286200
+450215437~1933333237 MultiHash: crc32(th+step1)): 0 2722545433
+450215437~1933333237 MultiHash: crc32(th+step1)): 1 1033649287
+450215437~1933333237 MultiHash: crc32(th+step1)): 2 1182973540
+450215437~1933333237 MultiHash: crc32(th+step1)): 3 3646438906
+450215437~1933333237 MultiHash: crc32(th+step1)): 4 2965355426
+450215437~1933333237 MultiHash: crc32(th+step1)): 5 795162684
+1842515611~1684880638 MultiHash: crc32(th+step1)): 0 1696913515
+1842515611~1684880638 MultiHash: crc32(th+step1)): 1 1913437355
+1842515611~1684880638 MultiHash: crc32(th+step1)): 2 1265897963
+1842515611~1684880638 MultiHash: crc32(th+step1)): 3 1549563179
+1842515611~1684880638 MultiHash: crc32(th+step1)): 4 965036907
+1842515611~1684880638 MultiHash: crc32(th+step1)): 5 783101867
+==================
+WARNING: DATA RACE
+Read at 0x00c0001480c0 by goroutine 45:
+  strings.Join()
+      /usr/local/go/src/strings/strings.go:434 +0x9f
+  coursera/__grader/assigments/hw2_signer.MultiHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:85 +0x3a4
+
+Previous write at 0x00c0001480c0 by goroutine 46:
+  coursera/__grader/assigments/hw2_signer.iterMultiHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:93 +0x13d
+
+Goroutine 45 (running) created at:
+  coursera/__grader/assigments/hw2_signer.MultiHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:71 +0xb0
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+
+Goroutine 46 (finished) created at:
+  coursera/__grader/assigments/hw2_signer.MultiHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:77 +0x1da
+==================
+c_in: 29568666068035183841425683795340791879727309630931025356555
+2226203566~3690458478 MultiHash: crc32(th+step1)): 0 399449208
+2226203566~3690458478 MultiHash: crc32(th+step1)): 1 15169720
+2226203566~3690458478 MultiHash: crc32(th+step1)): 2 966776312
+2226203566~3690458478 MultiHash: crc32(th+step1)): 3 783790392
+2226203566~3690458478 MultiHash: crc32(th+step1)): 4 1265536888
+2226203566~3690458478 MultiHash: crc32(th+step1)): 5 1548151736
+c_in: 4958044192186797981418233587017209679042592862002427381542
+4194326291~2004971030 MultiHash: crc32(th+step1)): 0 1173136728
+4194326291~2004971030 MultiHash: crc32(th+step1)): 1 1388626328
+4194326291~2004971030 MultiHash: crc32(th+step1)): 2 1807510744
+4194326291~2004971030 MultiHash: crc32(th+step1)): 3 2090076184
+4194326291~2004971030 MultiHash: crc32(th+step1)): 4 424490584
+4194326291~2004971030 MultiHash: crc32(th+step1)): 5 241521304
+c_in: 4958044192186797981418233587017209679042592862002427381542
+c_in: 27225454331033649287118297354036464389062965355426795162684
+c_in: 1696913515191343735512658979631549563179965036907783101867
+c_in: 3994492081516972096677631278379039212655368881548151736
+c_in: 1173136728138862632818075107442090076184424490584241521304
+==================
+WARNING: DATA RACE
+Write at 0x00c00013c190 by goroutine 20:
+  runtime.closechan()
+      /usr/local/go/src/runtime/chan.go:334 +0x0
+  coursera/__grader/assigments/hw2_signer.SingleHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:62 +0x10e
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+
+Previous read at 0x00c00013c190 by goroutine 22:
+  runtime.chansend()
+      /usr/local/go/src/runtime/chan.go:142 +0x0
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:56 +0x2ea
+
+Goroutine 20 (running) created at:
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:19 +0xd6
+  coursera/__grader/assigments/hw2_signer.TestSigner()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:127 +0x639
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+
+Goroutine 22 (finished) created at:
+  coursera/__grader/assigments/hw2_signer.SingleHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:37 +0xcd
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00c00013c1f0 by goroutine 21:
+  runtime.closechan()
+      /usr/local/go/src/runtime/chan.go:334 +0x0
+  coursera/__grader/assigments/hw2_signer.MultiHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:90 +0xd3
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+
+Previous read at 0x00c00013c1f0 by goroutine 45:
+  runtime.chansend()
+      /usr/local/go/src/runtime/chan.go:142 +0x0
+  coursera/__grader/assigments/hw2_signer.MultiHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:87 +0x41f
+
+Goroutine 21 (running) created at:
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:19 +0xd6
+  coursera/__grader/assigments/hw2_signer.TestSigner()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:127 +0x639
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+
+Goroutine 45 (finished) created at:
+  coursera/__grader/assigments/hw2_signer.MultiHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:71 +0xb0
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c00012c050 by goroutine 18:
+  coursera/__grader/assigments/hw2_signer.TestSigner()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:133 +0x676
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+
+Previous write at 0x00c00012c050 by goroutine 24:
+  coursera/__grader/assigments/hw2_signer.TestSigner.func6()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:121 +0xd2
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+
+Goroutine 18 (running) created at:
+  testing.(*T).Run()
+      /usr/local/go/src/testing/testing.go:960 +0x651
+  testing.runTests.func1()
+      /usr/local/go/src/testing/testing.go:1202 +0xa6
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+  testing.runTests()
+      /usr/local/go/src/testing/testing.go:1200 +0x521
+  testing.(*M).Run()
+      /usr/local/go/src/testing/testing.go:1117 +0x2ff
+  main.main()
+      _testmain.go:48 +0x223
+
+Goroutine 24 (running) created at:
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:19 +0xd6
+  coursera/__grader/assigments/hw2_signer.TestSigner()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:127 +0x639
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0000fa030 by goroutine 18:
+  coursera/__grader/assigments/hw2_signer.TestSigner()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:142 +0x78a
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+
+Previous write at 0x00c0000fa030 by goroutine 42:
+  sync/atomic.AddInt32()
+      /usr/local/go/src/runtime/race_amd64.s:269 +0xb
+  coursera/__grader/assigments/hw2_signer.TestSigner.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:64 +0x4d
+  coursera/__grader/assigments/hw2_signer.TestSigner.func3()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:87 +0xa0
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:40 +0x156
+
+Goroutine 18 (running) created at:
+  testing.(*T).Run()
+      /usr/local/go/src/testing/testing.go:960 +0x651
+  testing.runTests.func1()
+      /usr/local/go/src/testing/testing.go:1202 +0xa6
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+  testing.runTests()
+      /usr/local/go/src/testing/testing.go:1200 +0x521
+  testing.(*M).Run()
+      /usr/local/go/src/testing/testing.go:1117 +0x2ff
+  main.main()
+      _testmain.go:48 +0x223
+
+Goroutine 42 (finished) created at:
+  coursera/__grader/assigments/hw2_signer.SingleHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:37 +0xcd
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0000fa034 by goroutine 18:
+  coursera/__grader/assigments/hw2_signer.TestSigner()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:143 +0x869
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+
+Previous write at 0x00c0000fa034 by goroutine 42:
+  sync/atomic.AddInt32()
+      /usr/local/go/src/runtime/race_amd64.s:269 +0xb
+  coursera/__grader/assigments/hw2_signer.TestSigner.func2()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:75 +0x4d
+  coursera/__grader/assigments/hw2_signer.TestSigner.func3()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:92 +0x222
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:40 +0x156
+
+Goroutine 18 (running) created at:
+  testing.(*T).Run()
+      /usr/local/go/src/testing/testing.go:960 +0x651
+  testing.runTests.func1()
+      /usr/local/go/src/testing/testing.go:1202 +0xa6
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+  testing.runTests()
+      /usr/local/go/src/testing/testing.go:1200 +0x521
+  testing.(*M).Run()
+      /usr/local/go/src/testing/testing.go:1117 +0x2ff
+  main.main()
+      _testmain.go:48 +0x223
+
+Goroutine 42 (finished) created at:
+  coursera/__grader/assigments/hw2_signer.SingleHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:37 +0xcd
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0000fa038 by goroutine 18:
+  coursera/__grader/assigments/hw2_signer.TestSigner()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:144 +0x842
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+
+Previous write at 0x00c0000fa038 by goroutine 42:
+  sync/atomic.AddInt32()
+      /usr/local/go/src/runtime/race_amd64.s:269 +0xb
+  coursera/__grader/assigments/hw2_signer.TestSigner.func3()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:86 +0x84
+  coursera/__grader/assigments/hw2_signer.SingleHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:40 +0x156
+
+Goroutine 18 (running) created at:
+  testing.(*T).Run()
+      /usr/local/go/src/testing/testing.go:960 +0x651
+  testing.runTests.func1()
+      /usr/local/go/src/testing/testing.go:1202 +0xa6
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+  testing.runTests()
+      /usr/local/go/src/testing/testing.go:1200 +0x521
+  testing.(*M).Run()
+      /usr/local/go/src/testing/testing.go:1117 +0x2ff
+  main.main()
+      _testmain.go:48 +0x223
+
+Goroutine 42 (finished) created at:
+  coursera/__grader/assigments/hw2_signer.SingleHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:37 +0xcd
+  coursera/__grader/assigments/hw2_signer.ExecutePipeline.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:20 +0x47
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0000fa03c by goroutine 18:
+  coursera/__grader/assigments/hw2_signer.TestSigner()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:145 +0x81e
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+
+Previous write at 0x00c0000fa03c by goroutine 46:
+  sync/atomic.AddInt32()
+      /usr/local/go/src/runtime/race_amd64.s:269 +0xb
+  coursera/__grader/assigments/hw2_signer.TestSigner.func4()
+      /go/src/coursera/__grader/assigments/hw2_signer/main_test.go:95 +0x5f
+  coursera/__grader/assigments/hw2_signer.iterMultiHash()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:93 +0xe7
+
+Goroutine 18 (running) created at:
+  testing.(*T).Run()
+      /usr/local/go/src/testing/testing.go:960 +0x651
+  testing.runTests.func1()
+      /usr/local/go/src/testing/testing.go:1202 +0xa6
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:909 +0x199
+  testing.runTests()
+      /usr/local/go/src/testing/testing.go:1200 +0x521
+  testing.(*M).Run()
+      /usr/local/go/src/testing/testing.go:1117 +0x2ff
+  main.main()
+      _testmain.go:48 +0x223
+
+Goroutine 46 (finished) created at:
+  coursera/__grader/assigments/hw2_signer.MultiHash.func1()
+      /go/src/coursera/__grader/assigments/hw2_signer/signer.go:77 +0x1da
+==================
+--- FAIL: TestSigner (2.80s)
+    testing.go:853: race detected during execution of test
+FAIL
+FAIL	coursera/__grader/assigments/hw2_signer	8.409s
+FAIL
+
+
+STDERR:

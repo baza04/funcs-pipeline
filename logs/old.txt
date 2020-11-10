@@ -1,0 +1,162 @@
+=== RUN   TestPipeline
+==================
+WARNING: DATA RACE
+Read at 0x00c00009006c by goroutine 6:
+  funcs-pipeline.TestPipeline()
+      /home/student/go/src/funcs-pipeline/main_test.go:43 +0x226
+  testing.tRunner()
+      /usr/lib/go-1.12/src/testing/testing.go:865 +0x163
+
+Previous write at 0x00c00009006c by goroutine 8:
+  sync/atomic.AddInt32()
+      /usr/lib/go-1.12/src/runtime/race_amd64.s:269 +0xb
+  funcs-pipeline.TestPipeline.func2()
+      /home/student/go/src/funcs-pipeline/main_test.go:38 +0x69
+  funcs-pipeline.ExecutePipeline.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:23 +0x47
+
+Goroutine 6 (running) created at:
+  testing.(*T).Run()
+      /usr/lib/go-1.12/src/testing/testing.go:916 +0x65a
+  testing.runTests.func1()
+      /usr/lib/go-1.12/src/testing/testing.go:1157 +0xa8
+  testing.tRunner()
+      /usr/lib/go-1.12/src/testing/testing.go:865 +0x163
+  testing.runTests()
+      /usr/lib/go-1.12/src/testing/testing.go:1155 +0x523
+  testing.(*M).Run()
+      /usr/lib/go-1.12/src/testing/testing.go:1072 +0x2eb
+  main.main()
+      _testmain.go:44 +0x222
+
+Goroutine 8 (running) created at:
+  funcs-pipeline.ExecutePipeline()
+      /home/student/go/src/funcs-pipeline/signer.go:21 +0xf7
+  funcs-pipeline.TestPipeline()
+      /home/student/go/src/funcs-pipeline/main_test.go:42 +0x1aa
+  testing.tRunner()
+      /usr/lib/go-1.12/src/testing/testing.go:865 +0x163
+==================
+--- FAIL: TestPipeline (2.80s)
+    testing.go:809: race detected during execution of test
+=== RUN   TestSigner
+==================
+WARNING: DATA RACE
+Read at 0x00c000084450 by goroutine 16:
+  funcs-pipeline.SingleHash.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:69 +0x26f
+
+Previous write at 0x00c000084450 by goroutine 19:
+  funcs-pipeline.SingleHash.func1.1()
+      /home/student/go/src/funcs-pipeline/signer.go:55 +0x9d
+
+Goroutine 16 (running) created at:
+  funcs-pipeline.SingleHash()
+      /home/student/go/src/funcs-pipeline/signer.go:40 +0xdf
+  funcs-pipeline.ExecutePipeline.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:23 +0x47
+
+Goroutine 19 (finished) created at:
+  funcs-pipeline.SingleHash.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:51 +0x1e6
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c000084460 by goroutine 16:
+  funcs-pipeline.SingleHash.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:69 +0x29c
+
+Previous write at 0x00c000084460 by goroutine 20:
+  funcs-pipeline.SingleHash.func1.2()
+      /home/student/go/src/funcs-pipeline/signer.go:63 +0x9d
+
+Goroutine 16 (running) created at:
+  funcs-pipeline.SingleHash()
+      /home/student/go/src/funcs-pipeline/signer.go:40 +0xdf
+  funcs-pipeline.ExecutePipeline.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:23 +0x47
+
+Goroutine 20 (finished) created at:
+  funcs-pipeline.SingleHash.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:58 +0x240
+==================
+MultiHash input: 4108050209~502633748
+
+==================
+WARNING: DATA RACE
+Write at 0x00c0000f4190 by goroutine 14:
+  runtime.closechan()
+      /usr/lib/go-1.12/src/runtime/chan.go:334 +0x0
+  funcs-pipeline.SingleHash()
+      /home/student/go/src/funcs-pipeline/signer.go:79 +0x11d
+  funcs-pipeline.ExecutePipeline.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:23 +0x47
+
+Previous read at 0x00c0000f4190 by goroutine 16:
+  runtime.chansend()
+      /usr/lib/go-1.12/src/runtime/chan.go:142 +0x0
+  funcs-pipeline.SingleHash.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:73 +0x365
+
+Goroutine 14 (running) created at:
+  funcs-pipeline.ExecutePipeline()
+      /home/student/go/src/funcs-pipeline/signer.go:21 +0xf7
+  funcs-pipeline.TestSigner()
+      /home/student/go/src/funcs-pipeline/main_test.go:127 +0x62d
+  testing.tRunner()
+      /usr/lib/go-1.12/src/testing/testing.go:865 +0x163
+
+Goroutine 16 (finished) created at:
+  funcs-pipeline.SingleHash()
+      /home/student/go/src/funcs-pipeline/signer.go:40 +0xdf
+  funcs-pipeline.ExecutePipeline.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:23 +0x47
+==================
+
+
+COMBINE_RESULTS SORTED ARR value: []
+
+==================
+WARNING: DATA RACE
+Read at 0x00c0000ec060 by goroutine 12:
+  funcs-pipeline.TestSigner()
+      /home/student/go/src/funcs-pipeline/main_test.go:135 +0x66d
+  testing.tRunner()
+      /usr/lib/go-1.12/src/testing/testing.go:865 +0x163
+
+Previous write at 0x00c0000ec060 by goroutine 18:
+  funcs-pipeline.TestSigner.func6()
+      /home/student/go/src/funcs-pipeline/main_test.go:121 +0xd5
+  funcs-pipeline.ExecutePipeline.func1()
+      /home/student/go/src/funcs-pipeline/signer.go:23 +0x47
+
+Goroutine 12 (running) created at:
+  testing.(*T).Run()
+      /usr/lib/go-1.12/src/testing/testing.go:916 +0x65a
+  testing.runTests.func1()
+      /usr/lib/go-1.12/src/testing/testing.go:1157 +0xa8
+  testing.tRunner()
+      /usr/lib/go-1.12/src/testing/testing.go:865 +0x163
+  testing.runTests()
+      /usr/lib/go-1.12/src/testing/testing.go:1155 +0x523
+  testing.(*M).Run()
+      /usr/lib/go-1.12/src/testing/testing.go:1072 +0x2eb
+  main.main()
+      _testmain.go:44 +0x222
+
+Goroutine 18 (running) created at:
+  funcs-pipeline.ExecutePipeline()
+      /home/student/go/src/funcs-pipeline/signer.go:21 +0xf7
+  funcs-pipeline.TestSigner()
+      /home/student/go/src/funcs-pipeline/main_test.go:127 +0x62d
+  testing.tRunner()
+      /usr/lib/go-1.12/src/testing/testing.go:865 +0x163
+==================
+--- FAIL: TestSigner (2.80s)
+    main_test.go:136: results not match
+        Got 1: 
+    main_test.go:150: not enough hash-func calls
+    testing.go:809: race detected during execution of test
+FAIL
+exit status 1
+FAIL	funcs-pipeline	5.611s
