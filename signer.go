@@ -13,49 +13,34 @@ import (
 // ExecutePipeline обеспечивает нам конвейерную обработку функций-воркеров, которые что-то делают.
 func ExecutePipeline(freeFlowJobs ...job) {
 	in := make(chan interface{})
-	// start := time.Now()
 	for _, function := range freeFlowJobs {
 		out := make(chan interface{})
-		// if index == 4 {
-		// 	// time.Sleep(time.Millisecond * 2)
-		// 	time.Sleep(time.Millisecond * 2000)
-		// }
-		/* if index%2 == 0 {
-			go function(in, out)
-		} else {
-			go function(out, in)
-		} */
+
 		go func(in, out chan interface{}, function job) {
 			function(in, out)
 			time.Sleep(time.Millisecond * 2500)
-
 			close(out)
 		}(in, out, function)
 
-		// fmt.Printf("===========================\n%d job start time: %v\n===========================\n", index, time.Since(start))
 		in = out
 	}
 	time.Sleep(time.Millisecond * 2800)
-	// time.Sleep(time.Millisecond * 1500)
 }
 
 // SingleHash читает значение crc32(data)+"~"+crc32(md5(data)) ( конкатенация двух строк через ~), где data - то что пришло на вход (по сути - числа из первой функции)
 func SingleHash(in, out chan interface{}) {
-	// fmt.Println("	SIGNLE_HASH")
 	defer close(out)
 	var count int
 	for data := range in {
-		/* switch data.(type) {
-		case int: */
+
 		go func(data interface{}, out chan interface{}, count int) {
 			var input, crc32, md5, crc32md5, hash string
 			start := time.Now()
 			input = strconv.Itoa(data.(int))
-
-			fmt.Printf("%d SingleHash data: %s\n", count, input)
+			// fmt.Printf("%d SingleHash data: %s\n", count, input)
 
 			md5 = DataSignerMd5(input)
-			fmt.Printf("%d SingleHash md5(data): %s\n", count, md5)
+			// fmt.Printf("%d SingleHash md5(data): %s\n", count, md5)
 
 			go func(crc32 *string, input string, count int) {
 				temp := DataSignerCrc32(input)
@@ -77,10 +62,6 @@ func SingleHash(in, out chan interface{}) {
 		}(data, out, count)
 		time.Sleep(time.Millisecond * 12)
 		count++
-		/* case string:
-			in <- data
-			runtime.Gosched()
-		} */
 	}
 
 }
@@ -88,15 +69,8 @@ func SingleHash(in, out chan interface{}) {
 // MultiHash считает значение crc32(th+data)) (конкатенация цифры, приведённой к строке и строки), где th=0..5 ( т.е. 6 хешей на каждое входящее значение ), потом берёт конкатенацию результатов в порядке расчета (0..5), где data - то что пришло на вход (и ушло на выход из SingleHash)
 func MultiHash(in, out chan interface{}) {
 	defer close(out)
-	// fmt.Println("	MULTI_HASH")
 	for data := range in {
 
-		/* 	switch data.(type) {
-		case int:
-			// in <- data
-			// runtime.Gosched()
-
-		case string:  */ // do each arr element by goroutine then
 		go func(data interface{}, out chan interface{}) {
 			fmt.Printf("MultiHash input: %s\n\n", data)
 			var multiHash string
@@ -114,9 +88,8 @@ func MultiHash(in, out chan interface{}) {
 			multiHash += strings.Join(arr, "")
 
 			out <- multiHash
-			fmt.Printf("%s, #%s MultiHash result: %s\n\n", singleHash, a[1], multiHash)
+			// fmt.Printf("%s, #%s MultiHash result: %s\n\n", singleHash, a[1], multiHash)
 		}(data, out)
-		/* } */
 	}
 
 }
@@ -134,30 +107,18 @@ func CombineResults(in, out chan interface{}) {
 	var sArr []string
 	// var iArr []string
 	for hash := range in {
-		var strHash string // := hash.(string)
-		/* switch hash.(type) {
-		case int:
-			in <- hash
-			// runtime.Gosched()
-			// continue
-		case string: */
-		strHash = hash.(string)
+		strHash := hash.(string)
 		fmt.Println("c_in:", strHash)
 		sArr = append(sArr, strHash)
-		// // iArr = append(iArr, strHash)
-		/* } */
-		fmt.Printf("\n\nCOMBINE_RESULTS ARR len: %d, value: %v\n\n", len(sArr), sArr)
-		// // fmt.Printf("\n\nCOMBINE_RESULTS ARR len: %d, value: %v\n\n", len(iArr), iArr)
+
+		// fmt.Printf("\n\nCOMBINE_RESULTS ARR len: %d, value: %v\n\n", len(sArr), sArr)
 	}
 	// need to close channels to end range from in
 	fmt.Println("TEST TEST TEST")
 
 	sort.Strings(sArr)
-	// sort.Strings(iArr)
 	fmt.Printf("\n\nCOMBINE_RESULTS SORTED ARR value: %v\n\n", sArr)
 	result := strings.Join(sArr, "_")
-	// result := strings.Join(iArr, "_")
 	// fmt.Println(result)
 	out <- result
-	// in <- result
 }
