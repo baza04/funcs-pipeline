@@ -9,9 +9,8 @@ import (
 	"time"
 )
 
-// why for loop can`t work in goroutine
-
-// ExecutePipeline обеспечивает нам конвейерную обработку функций-воркеров, которые что-то делают.
+// ExecutePipeline обеспечивает нам конвейерную обработку
+// функций-воркеров, которые что-то делают.
 func ExecutePipeline(freeFlowJobs ...job) {
 	wg := &sync.WaitGroup{}
 	in := make(chan interface{})
@@ -25,13 +24,16 @@ func ExecutePipeline(freeFlowJobs ...job) {
 	wg.Wait()
 }
 
+// work call each job async in goroutine
 func work(wg *sync.WaitGroup, function job, in, out chan interface{}) {
 	defer wg.Done()
 	defer close(out)
 	function(in, out) // call incoming job
 }
 
-// SingleHash читает значение crc32(data)+"~"+crc32(md5(data)) ( конкатенация двух строк через ~), где data - то что пришло на вход (по сути - числа из первой функции)
+// SingleHash читает значение crc32(data)+"~"+crc32(md5(data))
+// (конкатенация двух строк через ~), где data - то что пришло
+// на вход (по сути - числа из первой функции)
 func SingleHash(in, out chan interface{}) {
 	wgSingleHash := &sync.WaitGroup{} // wait goroutines called in singleHash
 	for value := range in {
@@ -44,15 +46,16 @@ func SingleHash(in, out chan interface{}) {
 
 		time.Sleep(time.Millisecond * 10)
 	}
-	wgSingleHash.Wait() // Waiting
-
+	wgSingleHash.Wait() // Waiting all singleHash goroutines
 }
 
+// iterSingleHash count singleHash for each input value async
 func iterSingleHash(wgSingleHash *sync.WaitGroup, out chan interface{}, data, md5 string) {
 	defer wgSingleHash.Done()
 
 	crc32Ch := make(chan string)
 	crc32md5Ch := make(chan string)
+
 	go func(crc32Ch chan string, data string) {
 		crc32Ch <- DataSignerCrc32(data)
 	}(crc32Ch, data)
@@ -66,19 +69,20 @@ func iterSingleHash(wgSingleHash *sync.WaitGroup, out chan interface{}, data, md
 	singeHash := crc32 + "~" + crc32md5
 
 	out <- singeHash
-	// fmt.Printf("%s SingleHash md5(data): %s\n", data, md5)
-	// fmt.Printf("%s SingleHash crc32(data): %s\n", data, crc32)
-	// fmt.Printf("%s SingleHash crc32(md5(data)): %s\n", data, crc32md5)
-	// fmt.Printf("%s SingleHash result: %s\n\n", data, singeHash)
+	fmt.Printf("%s SingleHash md5(data): %s\n", data, md5)
+	fmt.Printf("%s SingleHash crc32(data): %s\n", data, crc32)
+	fmt.Printf("%s SingleHash crc32(md5(data)): %s\n", data, crc32md5)
+	fmt.Printf("%s SingleHash result: %s\n\n", data, singeHash)
 }
 
-// MultiHash считает значение crc32(th+data)) (конкатенация цифры, приведённой к строке и строки), где th=0..5 ( т.е. 6 хешей на каждое входящее значение ), потом берёт конкатенацию результатов в порядке расчета (0..5), где data - то что пришло на вход (и ушло на выход из SingleHash)
+// MultiHash считает значение crc32(th+data)), где th = 0-5,
+// потом берёт конкатенацию результатов в порядке расчета (0...5)
 func MultiHash(in, out chan interface{}) {
 	wgMultiHash := &sync.WaitGroup{} // wait ending all multiHash goroutines
 
 	for data := range in {
 		singleHash := fmt.Sprintf("%v", data)
-		// fmt.Printf("MultiHash input: %s\n", singleHash)
+		fmt.Printf("MultiHash input: %s\n", singleHash)
 
 		wgMultiHash.Add(1)
 		go iterMultiHash(wgMultiHash, out, singleHash)
@@ -96,7 +100,7 @@ func iterMultiHash(wgMultiHash *sync.WaitGroup, out chan interface{}, singleHash
 		go func(wgTemp *sync.WaitGroup, arr []string, th int, singleHash string) {
 			defer wgTemp.Done()
 			arr[th] = DataSignerCrc32(strconv.Itoa(th) + singleHash) // do it with goroutine
-			// fmt.Printf("%s MultiHash: crc32(th+step1)): %d %s\n", singleHash, th, arr[th])
+			fmt.Printf("%s MultiHash: crc32(th+step1)): %d %s\n", singleHash, th, arr[th])
 
 		}(wgTemp, arr, th, singleHash)
 
@@ -107,18 +111,18 @@ func iterMultiHash(wgMultiHash *sync.WaitGroup, out chan interface{}, singleHash
 
 }
 
-//CombineResults получает все результаты, сортирует (https://golang.org/pkg/sort/), объединяет отсортированный результат через _ (символ подчеркивания) в одну строку
+// CombineResults получает все результаты, сортирует их с помощью пакета sort в go,
+// объединяет отсортированный результат через "_" (символ подчеркивания) в одну строку
 func CombineResults(in, out chan interface{}) {
-
 	var sArr []string
 	for hash := range in {
 		strHash := hash.(string)
-		// fmt.Println("c_in:", strHash)
+		fmt.Println("c_in:", strHash)
 		sArr = append(sArr, strHash)
 	}
 
 	sort.Strings(sArr)
 	result := strings.Join(sArr, "_")
-	// fmt.Println(result)
+	fmt.Println(result)
 	out <- result
 }
